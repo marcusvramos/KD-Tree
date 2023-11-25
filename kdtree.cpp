@@ -112,7 +112,7 @@ Lista *mediana(Lista *inicio, Lista *fim) {
     	i++;
     }
     
-    // Remover a ligaÁ„o com o restante da lista isolando a mediana
+    // Remover a liga√ß√£o com o restante da lista isolando a mediana
     Lista *aux2 = aux;
     aux = aux->prox;
     aux2->prox = NULL;
@@ -214,7 +214,7 @@ void imprimirArvoreComGalhos(Tree *tree, int x, int y, int espacoHorizontal) {
             gotoxy(novoXEsq, novoYFilhoEsq);
             printf("/");
             
-            int novoEspacoHorizontalEsq = espacoHorizontal / 2; // Novo espaÁamento horizontal para o prÛximo nÛ
+            int novoEspacoHorizontalEsq = espacoHorizontal / 2; // Novo espa√ßamento horizontal para o pr√≥ximo n√≥
             imprimirArvoreComGalhos(tree->esq, novoXEsq, novoYFilhoEsq + 1, novoEspacoHorizontalEsq);
         }
 
@@ -230,7 +230,7 @@ void imprimirArvoreComGalhos(Tree *tree, int x, int y, int espacoHorizontal) {
             gotoxy(novoXDir, novoYFilhoDir);
             printf("\\");
             
-            int novoEspacoHorizontalDir = espacoHorizontal / 2; // Novo espaÁamento horizontal para o prÛximo nÛ
+            int novoEspacoHorizontalDir = espacoHorizontal / 2; // Novo espa√ßamento horizontal para o pr√≥ximo n√≥
             imprimirArvoreComGalhos(tree->dir, novoXDir, novoYFilhoDir + 1, novoEspacoHorizontalDir);
         }
     }
@@ -279,14 +279,14 @@ int main()
     Info coordenada = {20, 30};
     double raio = 10.0;
     printf("\n\n");
-    printf("Pontos mais proximos: ");
+    printf("Pontos mais proximos de (%d, %d): ", coordenada.x, coordenada.y);
     buscarPontosProximos(arvore, coordenada, raio);
     
 	printf("\n\n");
     printf("\nArvore KDTREE:\n");
-    int xInicial = 40; // Coordenada x inicial para a impress„o
-    int yInicial = 15;  // Coordenada y inicial para a impress„o
-    int nivelEspaco = 20; // EspaÁo entre os nÛs
+    int xInicial = 40; // Coordenada x inicial para a impress√£o
+    int yInicial = 15;  // Coordenada y inicial para a impress√£o
+    int nivelEspaco = 20; // Espa√ßo entre os n√≥s
     imprimirArvoreComGalhos(arvore, xInicial, yInicial, nivelEspaco);
     
     getch();
