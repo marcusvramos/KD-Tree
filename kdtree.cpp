@@ -6,8 +6,6 @@
 #include <time.h>
 #include <windows.h>
 
-
-
 struct infoNodo
 {
     int x;
@@ -32,6 +30,57 @@ struct TpLista
 };
 
 typedef struct TpLista Lista;
+
+typedef struct Node {
+    Tree *data;
+    struct Node *next;
+} Node;
+
+typedef struct {
+    Node *front; // inicio da fila
+    Node *rear; // fim da fila
+} Fila;
+
+void Init(Fila **f) {
+    (*f) = (Fila *)malloc(sizeof(Fila));
+    (*f)->front = (*f)->rear = NULL;
+}
+
+void enqueue(Fila **f, Tree *valor) {
+    Node *novoNode = (Node *)malloc(sizeof(Node));
+    novoNode->data = valor;
+    novoNode->next = NULL;
+
+    if ((*f)->rear == NULL) {
+        (*f)->front = (*f)->rear = novoNode;
+        return;
+    }
+
+    (*f)->rear->next = novoNode;
+    (*f)->rear = novoNode;
+}
+
+void dequeue(Fila **f, Tree **valor) {
+    if ((*f)->front == NULL) {
+        *valor = NULL;
+        return;
+    }
+
+    Node *temp = (*f)->front;
+    *valor = temp->data;
+    (*f)->front = (*f)->front->next;
+
+    if ((*f)->front == NULL) {
+        (*f)->rear = NULL;
+    }
+
+    free(temp);
+}
+
+int isEmpty(Fila *f) {
+    return (f->front == NULL);
+}
+
 
 int gerarRandomico(int min, int max)
 {
@@ -112,7 +161,7 @@ Lista *mediana(Lista *inicio, Lista *fim) {
     	i++;
     }
     
-    // Remover a ligaÁ„o com o restante da lista isolando a mediana
+    // Remover a liga√ß√£o com o restante da lista isolando a mediana
     Lista *aux2 = aux;
     aux = aux->prox;
     aux2->prox = NULL;
@@ -214,7 +263,7 @@ void imprimirArvoreComGalhos(Tree *tree, int x, int y, int espacoHorizontal) {
             gotoxy(novoXEsq, novoYFilhoEsq);
             printf("/");
             
-            int novoEspacoHorizontalEsq = espacoHorizontal / 2; // Novo espaÁamento horizontal para o prÛximo nÛ
+            int novoEspacoHorizontalEsq = espacoHorizontal / 2; // Novo espa√ßamento horizontal para o pr√≥ximo n√≥
             imprimirArvoreComGalhos(tree->esq, novoXEsq, novoYFilhoEsq + 1, novoEspacoHorizontalEsq);
         }
 
@@ -230,7 +279,7 @@ void imprimirArvoreComGalhos(Tree *tree, int x, int y, int espacoHorizontal) {
             gotoxy(novoXDir, novoYFilhoDir);
             printf("\\");
             
-            int novoEspacoHorizontalDir = espacoHorizontal / 2; // Novo espaÁamento horizontal para o prÛximo nÛ
+            int novoEspacoHorizontalDir = espacoHorizontal / 2; // Novo espa√ßamento horizontal para o pr√≥ximo n√≥
             imprimirArvoreComGalhos(tree->dir, novoXDir, novoYFilhoDir + 1, novoEspacoHorizontalDir);
         }
     }
@@ -241,20 +290,49 @@ double calcularDistancia(Info p1, Info p2) {
     return sqrt(pow((p1.x - p2.x), 2) + pow((p1.y - p2.y), 2));
 }
 
-void buscarPontosProximos(Tree *root, Info coordenada, double raio) {
-    if (root == NULL) {
-        return;
+void buscarPontosProximos(Tree *root, Info coordenada, double raio, Fila **pontosProximos) {
+    Fila *fila;
+    Init(&fila);
+    int encontrou = 0;
+    double distancia;
+    enqueue(&fila, root);
+    
+    while(!isEmpty(fila)) {
+    	dequeue(&fila, &root);
+    	distancia = calcularDistancia(root->info, coordenada);
+    	if(distancia <= raio) {
+    		enqueue(&(*pontosProximos), root);
+    		encontrou = 1;
+    		if(root -> esq!=NULL){
+    			enqueue(&fila,root->esq);
+    		}
+    		if(root -> dir!=NULL){
+    			enqueue(&fila,root->dir);
+    		}
+    	} else {
+    		if(!encontrou) {
+    			if(root->esq!=NULL){
+    				enqueue(&fila,root->esq);
+    			}
+    			if(root->dir!=NULL){
+    				enqueue(&fila,root->dir);
+    			}
+    		}
+    	}
     }
+}
 
-    double distancia = calcularDistancia(root->info, coordenada);
-
-    if (distancia <= raio) {
-        printf("(%d, %d) ", root->info.x, root->info.y);
-    }
-
-    // Verifica recursivamente nos filhos
-    buscarPontosProximos(root->esq, coordenada, raio);
-    buscarPontosProximos(root->dir, coordenada, raio);
+void exibirPontosProximos(Fila *fila){
+	Tree *aux = NULL;
+	
+	if(isEmpty(fila)){
+		printf("Nenhum ponto encontrado dentro do raio especificado.");
+	}
+	
+	while(!isEmpty(fila)){
+		dequeue(&fila, &aux);
+		printf("(%d, %d) ", aux->info.x, aux->info.y);
+	}
 }
 
 void maximizarJanelaPrompt(){
@@ -278,15 +356,18 @@ int main()
     
     Info coordenada = {20, 30};
     double raio = 10.0;
+    Fila *pontosProximos;
+    Init(&pontosProximos);
     printf("\n\n");
-    printf("Pontos mais proximos: ");
-    buscarPontosProximos(arvore, coordenada, raio);
+    printf("Pontos mais proximos de (%d, %d): ", coordenada.x, coordenada.y);
+    buscarPontosProximos(arvore, coordenada, raio, &pontosProximos);
+    exibirPontosProximos(pontosProximos);
     
 	printf("\n\n");
     printf("\nArvore KDTREE:\n");
-    int xInicial = 40; // Coordenada x inicial para a impress„o
-    int yInicial = 15;  // Coordenada y inicial para a impress„o
-    int nivelEspaco = 20; // EspaÁo entre os nÛs
+    int xInicial = 40; // Coordenada x inicial para a impress√£o
+    int yInicial = 15;  // Coordenada y inicial para a impress√£o
+    int nivelEspaco = 20; // Espa√ßo entre os n√≥s
     imprimirArvoreComGalhos(arvore, xInicial, yInicial, nivelEspaco);
     
     getch();
